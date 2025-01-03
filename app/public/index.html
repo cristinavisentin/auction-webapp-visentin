@@ -71,7 +71,7 @@
             <!-- Homepage -->
             <section id="homepage" v-if="currentSection === 'homepage'">
                 <h1>Uollapop</h1>
-                <h6>Your online auction, sell anything from the comfort of your home to the highest bidder!</h6>
+                <h6 id="home">Your online auction, sell anything from the comfort of your home to the highest bidder!</h6>
                 <div class="container mt-5 text-center custom-width-for-inputs">
                     <div class="alert alert-success" role="alert" v-if="success">
                         You have been logged out successfully.
@@ -288,6 +288,9 @@
                             </tr>
                         </tbody>
                     </table>
+                    <div class="alert alert-warning" role="alert" v-if="noresults">
+                        This auction hasn't received any bids yet.
+                    </div>
                     <div v-if="isActive(date_details)">
                         <div class="d-grid gap-2 col-3 mx-auto">
                             <button class="btn btn-outline-dark" 
@@ -400,6 +403,9 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="alert alert-warning" role="alert" v-if="noresults">
+                        This user has not won any auctions yet.
                     </div>
                     <div class="d-flex flex-column flex-md-row justify-content-center mb-4">
                         <button class="btn btn-outline-primary mb-2 mb-md-0 me-md-4" @click.prevent="setSection('auctions')">
@@ -574,6 +580,9 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="alert alert-warning" role="alert" v-if="noresults">
+                        You haven't created any auctions yet.
                     </div>
                 </div>
             </section>

@@ -8,6 +8,7 @@ const app = createApp({
             fail: false,
             success: false,
             wrongInput: false,
+            noresults: false,
 
             signinData: {
                 username: "",
@@ -55,6 +56,7 @@ const app = createApp({
             this.resetWrongInput();
             this.resetSuccess();
             this.expr = "";
+            this.noresults = false;
             this.currentSection = section;
             if(section === "auctions") {
                 this.showAuctions(); 
@@ -251,6 +253,9 @@ const app = createApp({
                     } else {
                         this.user_info = data.requested_user;
                         this.auctions_won = data.won_auctions;
+                        if(this.auctions_won.length === 0) {
+                            this.noresults = true;
+                        }
                     }
                 } else if(response.status === 404) {
                     this.fail = true;
@@ -340,13 +345,17 @@ const app = createApp({
                 if(response.status === 200) {
                     this.whoamime = data.myself;
                     this.whoamiauctions = data.myAuctions;
-                    this.whoamiauctions.forEach(item => {
-                        const b = this.getLastBid(item.bids);
-                        item.currentBid = b ? b.value : 0; 
-                        if(!this.isActive(item.closingDate)) {
-                            item.gain = b ? b.value : 0;
-                        }
-                    });
+                    if(this.whoamiauctions.length === 0) {
+                        this.noresults = true;
+                    } else {
+                        this.whoamiauctions.forEach(item => {
+                            const b = this.getLastBid(item.bids);
+                            item.currentBid = b ? b.value : 0; 
+                            if(!this.isActive(item.closingDate)) {
+                                item.gain = b ? b.value : 0;
+                            }
+                        });
+                    }
                 } else {
                     console.log("Error.", data);
                 }  
@@ -369,6 +378,9 @@ const app = createApp({
                 const data = await response.json();
                 if(response.status === 200) {
                     this.bids_list = data;
+                    if(this.bids_list.length === 0) {
+                        this.noresults = true;
+                    }
                 } else {
                     console.log("Error.", data);
                 }  
