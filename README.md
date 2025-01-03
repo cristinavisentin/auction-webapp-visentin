@@ -1,6 +1,7 @@
 ## Online Auctions Web Application
 
-This repository contains the source code for a web application developed as the final project for the Web Programming course at the University of Trieste.
+This repository contains the source code for a web application 
+developed as the final project for the Web Programming course at the University of Trieste.
 
 ### How to use
 
@@ -16,3 +17,7 @@ docker compose up
 http://localhost:3000
 ```
 
+#### Note
+
+The database is initially populated with 10 user accounts, each with their respective auctions and bids. 
+All users share the same password: `1234`.
