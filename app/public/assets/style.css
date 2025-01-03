@@ -1,0 +1,28 @@
+.custom-width-for-inputs {
+    width: 50%;
+}
+#browser-window {
+    min-height: 85vh;
+}
+footer {
+    min-height: 12vh;
+}
+.alert, h6, h1 {
+    text-align: center;
+}
+nav {
+    font-size: 13pt;
+}
+h1 {
+    margin-top: 1em;
+}
+h4 {
+    text-decoration: underline;
+}
+img {
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    margin-bottom: 50px;
+}

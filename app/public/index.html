@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Uollapop</title>
+        <!-- Bootstrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <!-- Vue -->
+        <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+        <!-- Custom -->
+        <link rel="stylesheet" href="./assets/style.css">
+        <script type="module" src="./assets/app.js" defer></script>
+    </head>
+    <body id="app">
+        <section id="browser-window">
+            <nav class="navbar navbar-expand-lg bg-body-tertiary container mt-4">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="/" @click.prevent="setSection('homepage')">Uollapop</a>
+                  
+                    <button class="navbar-toggler" 
+                        type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/" @click.prevent="setSection('auctions')">Auctions</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/" @click.prevent="setSection('community')">Community</a>
+                            </li>
+                        </ul>
+              
+                        <!-- Bottoni Sign In e Sign Up a destra -->
+                        <div class="d-flex">
+                            <section v-if="!isAuthenticated">
+                                <button class="btn btn-primary me-2" 
+                                    @click.prevent="setSection('signin')">Sign In
+                                </button>
+                                <button class="btn btn-outline-primary" 
+                                    @click.prevent="setSection('signup')">Sign Up
+                                </button>
+                            </section>
+                            <section v-if="isAuthenticated">
+                                <button class="btn btn-outline-primary me-2 mt-2" 
+                                    @click.prevent="setSection('newauction')">Create new auction
+                                </button>
+                                <button class="btn btn-primary me-2 mt-2" 
+                                    @click.prevent="handleLogout()">Log Out
+                                </button>
+                                <button class="btn btn-primary me-2 mt-2" 
+                                    @click.prevent="setSection('whoami')"
+                                    data-bs-toggle="tooltip" 
+                                    data-bs-placement="bottom" 
+                                    title="Profile">
+                                    <span class="navbar-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16"><path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/><path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/></svg>
+                                    </span>   
+                                </button>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Homepage -->
+            <section id="homepage" v-if="currentSection === 'homepage'">
+                <h1>Uollapop</h1>
+                <h6>Your online auction, sell anything from the comfort of your home to the highest bidder!</h6>
+                <div class="container mt-5 text-center custom-width-for-inputs">
+                    <div class="alert alert-success" role="alert" v-if="success">
+                        You have been logged out successfully.
+                    </div>
+                </div>
+                <div class="container mt-5 text-center">
+                    <button class="btn btn-outline-dark me-2" 
+                        @click.prevent="setSection('signup')">Explore the auctions, join the community and... sell something!
+                    </button>
+                    <div class="mt-5"><img src="https://s3.ap-southeast-2.amazonaws.com/app-spoke-sites-au/uploads/sites/383/2023/11/auction-toowoomba.png" alt="immagine di aste stilizzata"></div>
+                </div>
+            </section>
+
+            <!-- Auctions page -->
+            <section id="auctions" v-if="currentSection === 'auctions'">
+                <h1>All auctions</h1>
+                <div class="container mt-5 text-center">
+                    <form class="d-flex justify-content-center align-items-center">
+                        <div class="input-group mb-3 custom-width-for-inputs">
+                            <input id="inputAuction" type="search" v-model="expr" class="form-control" placeholder="Search for an auction..." @focus="resetFail()"/>
+                            <button class="btn btn-primary" type="submit" @click.prevent="showAuctions()">Search</button>
+                        </div>
+                    </form>
+                    <div class="alert alert-warning" role="alert" v-if="fail">
+                        No such auction title found.
+                    </div>
+                    
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="a in auction_list" :key="a.auctionId">
+                                <td><a href="/" @click.prevent="setSection('auctiondetails', a.auctionId)">{{ a.title }}</a></td>
+                                <td>{{ a.description }}</td>
+                                <td>
+                                    <div v-if="isActive(a.closingDate)">
+                                        <span class="badge bg-success rounded-pill d-inline">Open</span>
+                                    </div>
+                                    <div v-else>
+                                        <span class="badge bg-danger rounded-pill d-inline">Closed</span>
+                                    <div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn btn-outline-primary mt-4 mb-4" @click.prevent="showAuctions()">Show all</button>
+                </div>    
+            </section>
+
+            <!-- Auction details page -->
+            <section id="auctiondetails" v-if="currentSection === 'auctiondetails'">
+                <h1>Auction details</h1>
+                <div class="container mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>{{ auction_info.title }}</h4>
+                            <p>
+                                <span v-if="isActive(auction_info.closingDate)" class="badge bg-success rounded-pill">Open</span>
+                                <span v-else class="badge bg-danger rounded-pill">Closed</span>
+                            </p>
+                            <p class="card-text"><strong>Description: </strong>{{ auction_info.description }}</p>
+                            <p class="card-text"><strong>Closing date: </strong>{{ new Date(auction_info.closingDate).toLocaleString() }}</p>
+                            <p class="card-text"><strong>Initial value: </strong>{{ auction_info.initialValue }} €</p>
+                            <p class="card-text"><strong>Current bid: </strong>{{ auction_info.currentBid }} €</p>
+                            <p class="card-text"><strong>Winner: </strong>
+                                <a href="/" @click.prevent="setSection('userdetails', auction_info.userId)"> {{ auction_info.winner }}</a>
+                            </p>
+                            <p>
+                                <button class="btn btn-outline-dark"
+                                    @click.prevent="showBids(auction_info.auctionId, auction_info.title, auction_info.closingDate)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16"><path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/></svg>
+                                    Bids list
+                                </button>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="text-center"><button class="btn btn-outline-primary mt-4 mb-4" @click.prevent="setSection('auctions')">Back</button></div> 
+                </div>
+            </section>
+
+            <!-- New auction page -->
+            <section id="newauction" v-if="currentSection === 'newauction'">
+                <h1>Create Your Auction</h1>
+                <div class="container mt-5 mb-4 custom-width-for-inputs">
+                    <form v-if="isAuthenticated" @submit.prevent="handleNewAuction">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input v-model="auctionData.title" 
+                                type="text" 
+                                id="title" 
+                                class="form-control" 
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <input v-model="auctionData.description" 
+                                type="text" 
+                                id="description" 
+                                class="form-control" 
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="datetime" class="form-label">Closing time</label>
+                            <input v-model="auctionData.closingDatetime" 
+                                type="datetime-local"
+                                id="datetime" 
+                                class="form-control" 
+                                aria-describedby="not-changeable-field-warning"
+                                required
+                                @focus="resetFail()">
+                            <small id="not-changeable-field-warning" class="form-text text-muted">
+                                You won't be able to edit this field after submission.
+                            </small>
+                        </div>
+                        <div class="alert alert-warning" role="alert" v-if="fail">
+                            Past dates are not valid.
+                        </div>
+                        <div class="mb-3">
+                            <label for="value" class="form-label">Initial value</label>
+                            <input v-model="auctionData.initialValue" 
+                                type="number" 
+                                id="value" 
+                                class="form-control" 
+                                aria-describedby="not-changeable-field-warning"
+                                required
+                                @focus="resetWrongInput()">
+                            <small id="not-changeable-field-warning" class="form-text text-muted">
+                                You won't be able to edit this field after submission.
+                            </small>
+                        </div>
+                        <div class="alert alert-danger" role="alert" v-if="wrongInput">
+                            Initial value must be a positive number.
+                        </div>
+                        <div class="alert alert-success" role="alert" v-if="success">
+                            New auction created successfully!
+                        </div>
+                        <div class="text-center"><button class="btn btn-success w-50 mb-4" type="submit">
+                            <span class="spinner-border spinner-border-sm" v-if="success" role="status"></span>
+                            Create auction</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Update auction page -->
+            <section id="updateauction" v-if="currentSection === 'modify'">
+                <h1>Update your auction</h1>
+                <div class="container mt-5 text-center custom-width-for-inputs">
+                    <form @submit.prevent="modifyAuction" v-if="isAuthenticated">
+                        <div class="mb-3">
+                            <label for="mtitle" class="form-label">Title</label>
+                            <input v-model="auctionData.title"
+                                type="text" 
+                                id="mtitle" 
+                                class="form-control" 
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mdescription" class="form-label">Description</label>
+                            <input v-model="auctionData.description" 
+                                type="text" 
+                                id="mdescription" 
+                                class="form-control" 
+                                required>
+                        </div>
+                        <div class="alert alert-success" role="alert" v-if="success">
+                            Auction successfully updated!
+                        </div>
+                        <button type="submit" class="btn btn-success w-50">
+                            <span class="spinner-border spinner-border-sm" v-if="success" role="status"></span>
+                            Update</button>
+                    </form>
+                    <button class="btn btn-outline-primary w-50 mt-4 mb-4" @click.prevent="setSection('whoami')">Cancel</button>
+                </div>
+            </section>
+
+            <!-- Bids details and new bids page -->
+            <section id="newoffer-and-details" v-if="currentSection === 'offer'">
+                <h1>Bids for "{{ title_details }}"</h1>
+                <div class="container mt-5 text-center">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Value</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="b in bids_list" :key="b.bidId">
+                                <td>{{ b.value }} €</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-dark dropdown-toggle" 
+                                            id="dropdownMenuButton1" 
+                                            data-bs-toggle="dropdown"
+                                            @click.prevent="showBidDetails(b.bidId)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+                                                <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/>
+                                            </svg>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                            <li class="dropdown-item" href="/">
+                                                User: {{ bid_info.username }}</li>
+                                            <li class="dropdown-item" href="/">
+                                                Offer date: {{ new Date(bid_info.offerDate).toLocaleString() }}</li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div v-if="isActive(date_details)">
+                        <div class="d-grid gap-2 col-3 mx-auto">
+                            <button class="btn btn-outline-dark" 
+                                v-if="!isAuthenticated"
+                                @click.prevent="setSection('signin')">Sign In to make a new bid!
+                            </button>
+                            <button class="btn btn-primary" 
+                                v-if="isAuthenticated"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#new-bid">Make a new bid!
+                            </button>
+                        </div>
+                        <div class="collapse container mt-5 custom-width-for-inputs" id="new-bid">
+                            <form v-if="isAuthenticated" @submit.prevent="handleNewBid">
+                                <div class="mb-3">
+                                    <label for="new-offer" class="form-label">Insert here your bid</label>
+                                    <input v-model="bidValue" 
+                                        type="number" 
+                                        id="new-offer" 
+                                        class="form-control" 
+                                        required
+                                        @focus="resetWrongInput()">
+                                </div>
+                                <div class="alert alert-warning" role="alert" v-if="fail">
+                                    This auction is yours, you can not make a bid.
+                                </div>
+                                <div class="alert alert-danger" role="alert" v-if="wrongInput">
+                                    New bid must be a positive number higher than the current bid value.
+                                </div>
+                                <div class="alert alert-success" role="alert" v-if="success">
+                                    New bid created successfully!
+                                </div>
+                                <button class="btn btn-success w-50" type="submit">
+                                    <span class="spinner-border spinner-border-sm" v-if="success" role="status"></span>
+                                    Send</button>
+                            </form>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-primary mt-4 mb-4" @click.prevent="setSection('auctiondetails')">Back</button>
+                </div>
+            </section>
+
+            <!-- Users page -->
+            <section id="community" v-if="currentSection === 'community'">
+                <h1>Uollapop community</h1>
+                <div class="container mt-5 text-center">
+                    <form class="d-flex justify-content-center align-items-center">
+                        <div class="input-group mb-3 custom-width-for-inputs">
+                            <input type="search" v-model="expr" class="form-control" placeholder="Search a user..." @focus="resetFail()"/>
+                            <button class="btn btn-primary" @click.prevent="showCommunity()">Search</button>
+                        </div>
+                    </form>
+                    <div class="alert alert-warning" role="alert" v-if="fail">
+                            No such user found.
+                    </div>
+    
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Surname</th>
+                                <th>Username</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="u in users_list" :key="u.userId">
+                                <td>{{ u.name }}</td>
+                                <td>{{ u.surname }}</td>
+                                <td><a href="/" @click.prevent="setSection('userdetails', u.userId)">{{ u.username }}</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn btn-outline-primary mt-4 mb-4" @click.prevent="showCommunity()">Show all</button>
+                </div>
+            </section>
+
+            <!-- User datails page -->
+            <section id="userdetails" v-if="currentSection === 'userdetails'">
+                <h1>User details</h1>
+                <div class="container mt-5 text-center">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Surname</th>
+                                <th>Username</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ user_info.name }}</td>
+                                <td>{{ user_info.surname }}</td>
+                                <td>{{ user_info.username }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h1>Auctions won by {{ user_info.username }}</h1>
+                <div class="container mt-5">
+                    <div class="row">
+                        <div v-for="w in auctions_won" :key="w.title" 
+                            class="col-12 col-md-6 col-lg-4 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4>{{ w.auction.title }}</h4>
+                                    <p class="card-text"><strong>Description: </strong>{{ w.auction.description }}</p>
+                                    <p class="card-text"><strong>Closing date: </strong>{{ new Date(w.auction.closingDate).toLocaleString() }}</p>
+                                    <p class="card-text"><strong>Initial value: </strong>{{ w.auction.initialValue }} €</p>
+                                    <p class="card-text"><strong>Final value: </strong>{{ w.bid }} €</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column flex-md-row justify-content-center mb-4">
+                        <button class="btn btn-outline-primary mb-2 mb-md-0 me-md-4" @click.prevent="setSection('auctions')">
+                            Back to auctions list
+                        </button>
+                        <button class="btn btn-outline-primary" @click.prevent="setSection('community')">
+                            Back to community
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sign in page -->
+            <section id="signin" v-if="currentSection === 'signin'">
+                <h1>Sign In</h1>
+                <h6>New here? <a href="/" @click.prevent="setSection('signup')">Create an account</a>.</h6>
+                <div class="container mt-5 custom-width-for-inputs">
+                    <form @submit.prevent="handleSignin">
+                        <div class="mb-3">
+                            <label for="signinUsername" class="form-label">Username</label>
+                            <input v-model="signinData.username" 
+                            type="text" 
+                            id="signinUsername" 
+                            class="form-control" 
+                            required 
+                            @focus="resetFail()">
+                        </div>
+                        <div class="mb-3">
+                            <label for="signinPassword" class="form-label">Password</label>
+                            <input  v-model="signinData.password" 
+                            type="password" 
+                            id="signinPassword" 
+                            class="form-control" 
+                            required>
+                        </div>
+                        <div class="alert alert-success" role="alert" v-if="success">
+                            Login successful.
+                        </div>
+                        <div class="alert alert-danger" role="alert" v-if="fail">
+                            Invalid username or password.
+                        </div>
+                        <div class="text-center"><button type="submit" class="btn btn-primary w-50 mb-4">
+                            <span class="spinner-border spinner-border-sm" v-if="success" role="status"></span>
+                            Sign In</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+    
+            <!-- Sign up page -->
+            <section id="signup" v-if="currentSection === 'signup'">  
+                <h1>Sign Up</h1>
+                <h6>Already have an account? <a href="/" @click.prevent="setSection('signin')">Sign in</a>.</h6>
+                <div class="container mt-5 mb-4 custom-width-for-inputs">
+                    <form @submit.prevent="handleSignup">
+                        <div class="mb-3">
+                            <label for="registerName" class="form-label">Name</label>
+                            <input  v-model="registrationData.name" 
+                            type="text" 
+                            id="registerName" 
+                            class="form-control"
+                            required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerSurname" class="form-label">Surname</label>
+                            <input v-model="registrationData.surname"
+                            type="text" 
+                            id="registerSurname" 
+                            class="form-control" 
+                            required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerUsername" class="form-label">Username</label>
+                            <input v-model="registrationData.username" 
+                            type="text" 
+                            id="registerUsername" 
+                            class="form-control" 
+                            required
+                            @focus="resetFail()">
+                        </div>
+                        <div class="alert alert-warning" role="alert" v-if="wrongInput">
+                            The username is already taken, please choose a different one.
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerPassword" class="form-label">Password</label>
+                            <input v-model="registrationData.password" 
+                            type="password" 
+                            id="registerPassword" 
+                            class="form-control" 
+                            required
+                            @focus="resetFail()">
+                        </div>
+                        <div class="alert alert-success" role="alert" v-if="success">
+                            Registration successful.
+                        </div>
+                        <div class="text-center"><button type="submit" class="btn btn-primary w-50 mb-4">
+                            <span class="spinner-border spinner-border-sm" v-if="success" role="status"></span>
+                            Sign Up</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+            
+            <!-- Who am I page -->
+            <section id="whoami" v-if="currentSection === 'whoami'">
+                <h1>My personal information</h1>
+                <div class="container mt-5 text-center">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Surname</th>
+                                <th>Username</th>
+                                <!-- <th></th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ whoamime.name }}</td>
+                                <td>{{ whoamime.surname }}</td>
+                                <td>{{ whoamime.username }}</td>
+                                <!-- <td>
+                                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modal-delete-account">
+                                        Delete account
+                                    </button>
+                                </td> -->
+                            </tr>
+                        </tbody>
+                        <!-- <div class="modal fade" id="modal-delete-account" tabindex="-1" aria-labelledby="modal-delete-account-label">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="modal-delete-account-label">Delete account</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete your account?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click.prevent="deleteAccount(whoami.userId)">Delete</button>
+                                    </div>
+                                </div>
+                            </div> -->
+                        </div>
+                    </table>
+                </div>
+                <h1>My auctions</h1>
+                <div class="container mt-5 mb-4">
+                    <div class="row">
+                        <div v-for="w in whoamiauctions" :key="w.auctionId" class="col-12 col-md-6 col-lg-4 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4>{{ w.title }}</h4>
+                                    <p class="card-text"><strong>Description: </strong>{{ w.description }}</p>
+                                    <p class="card-text"><strong>Closing date: </strong>{{ new Date(w.closingDate).toLocaleString() }}</p>
+                                    <p class="card-text"><strong>Initial value: </strong>{{ w.initialValue }} €</p>
+                                    <p class="card-text"><strong>Current bid: </strong>{{ w.currentBid }} €</p>
+                                    <p class="card-text"><strong>Final gain: </strong>{{ w.gain }} €</p>
+                                    
+                                    <div v-if="isActive(w.closingDate)">
+                                        <span class="badge bg-success rounded-pill">Open</span>
+                                        <div class="d-flex justify-content-center mt-3">
+                                            <button class="btn btn-primary me-2" 
+                                                    @click.prevent="setSection('modify', w.auctionId)">
+                                                Update
+                                            </button>
+                                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modal-delete-auction">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div v-else>
+                                        <span class="badge bg-danger rounded-pill">Closed</span>
+                                    </div>
+    
+                                    <div class="modal fade" id="modal-delete-auction" tabindex="-1" aria-labelledby="modal-delete-auction-label">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="modal-delete-auction-label">Delete auction</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    Are you sure you want to delete "{{ w.title }}"?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click.prevent="deleteAuction(w.auctionId)">Delete</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+        <footer class="bg-dark text-white text-center py-3">
+            <p>&copy; 2024 Uollapop. All rights reserved.</p>
+        </footer>
+    </body>
+</html>

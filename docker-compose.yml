@@ -1,0 +1,19 @@
+services:
+  auction:
+    container_name: app-visentin
+    build: .
+    command: node app.js
+    ports:
+      - "3000:3000"
+    links:
+      - "mongodb:mongohost"
+  mongodb:
+    container_name: mongo-visentin
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_DATABASE: auction
+    volumes:
+      - ./data:/data/db
+      - ./app/db/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    ports:
+      - "27017:27017"

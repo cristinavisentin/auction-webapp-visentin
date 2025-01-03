@@ -1,0 +1,19 @@
+{
+  "name": "auction_visentin",
+  "version": "1.0.0",
+  "description": "A tentative web app for managing a digital auction on the web, created for the final project of the Web Programming course, academic year 2024-2025.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Cristina Visentin",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.2",
+    "express-validator": "^7.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.11.0"
+  }
+}
