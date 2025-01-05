@@ -137,8 +137,8 @@
                             </p>
                             <p class="card-text"><strong>Description: </strong>{{ auction_info.description }}</p>
                             <p class="card-text"><strong>Closing date: </strong>{{ new Date(auction_info.closingDate).toLocaleString() }}</p>
-                            <p class="card-text"><strong>Initial value: </strong>{{ auction_info.initialValue }} €</p>
-                            <p class="card-text"><strong>Current bid: </strong>{{ auction_info.currentBid }} €</p>
+                            <p class="card-text"><strong>Initial value: </strong>€ {{ auction_info.initialValue }}</p>
+                            <p class="card-text"><strong>Current bid: </strong>{{ auction_info.currentBid }}</p>
                             <p class="card-text"><strong>Winner: </strong>
                                 <a href="/" @click.prevent="setSection('userdetails', auction_info.userId)"> {{ auction_info.winner }}</a>
                             </p>
@@ -264,7 +264,7 @@
                         </thead>
                         <tbody>
                             <tr v-for="b in bids_list" :key="b.bidId">
-                                <td>{{ b.value }} €</td>
+                                <td>€ {{ b.value }}</td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-outline-dark dropdown-toggle" 
@@ -395,8 +395,8 @@
                                     <h4>{{ w.auction.title }}</h4>
                                     <p class="card-text"><strong>Description: </strong>{{ w.auction.description }}</p>
                                     <p class="card-text"><strong>Closing date: </strong>{{ new Date(w.auction.closingDate).toLocaleString() }}</p>
-                                    <p class="card-text"><strong>Initial value: </strong>{{ w.auction.initialValue }} €</p>
-                                    <p class="card-text"><strong>Final value: </strong>{{ w.bid }} €</p>
+                                    <p class="card-text"><strong>Initial value: </strong>€ {{ w.auction.initialValue }}</p>
+                                    <p class="card-text"><strong>Final value: </strong>€ {{ w.bid }}</p>
                                 </div>
                             </div>
                         </div>
@@ -537,9 +537,9 @@
                                     <h4>{{ w.title }}</h4>
                                     <p class="card-text"><strong>Description: </strong>{{ w.description }}</p>
                                     <p class="card-text"><strong>Closing date: </strong>{{ new Date(w.closingDate).toLocaleString() }}</p>
-                                    <p class="card-text"><strong>Initial value: </strong>{{ w.initialValue }} €</p>
-                                    <p class="card-text"><strong>Current bid: </strong>{{ w.currentBid }} €</p>
-                                    <p class="card-text"><strong>Final gain: </strong>{{ w.gain }} €</p>
+                                    <p class="card-text"><strong>Initial value: </strong>€ {{ w.initialValue }}</p>
+                                    <p class="card-text"><strong>Current bid: </strong>{{ w.currentBid }}</p>
+                                    <p class="card-text"><strong>Final gain: </strong>{{ w.gain }}</p>
                                     
                                     <div v-if="isActive(w.closingDate)">
                                         <span class="badge bg-success rounded-pill">Open</span>

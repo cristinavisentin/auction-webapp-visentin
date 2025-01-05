@@ -106,7 +106,7 @@ const app = createApp({
         },
 
         getLastBid(bids) {
-            if (bids && bids.length > 0) {
+            if(bids && bids.length > 0) {
                 return bids.reduce((maxBid, bid) => (bid.value > maxBid.value ? bid : maxBid), bids[0]);
             }
             return "Non ci sono ancora offerte";
@@ -137,7 +137,7 @@ const app = createApp({
                         this.expr = "";
                     } else {
                         this.auction_info = data;
-                        this.auction_info.currentBid = this.getLastBid(data.bids).value;
+                        this.auction_info.currentBid = `€ ${this.getLastBid(data.bids).value}`;
                         if(!this.isActive(data.closingDate)) {
                             this.auction_info.userId = this.getLastBid(data.bids).userId;
                             this.auction_info.winner = this.getLastBid(data.bids).username;
@@ -350,9 +350,9 @@ const app = createApp({
                     } else {
                         this.whoamiauctions.forEach(item => {
                             const b = this.getLastBid(item.bids);
-                            item.currentBid = b ? b.value : 0; 
+                            item.currentBid = b ? `€ ${b.value}` : ''; 
                             if(!this.isActive(item.closingDate)) {
-                                item.gain = b ? b.value : 0;
+                                item.gain = b ? `€ ${b.value}` : '';
                             }
                         });
                     }
