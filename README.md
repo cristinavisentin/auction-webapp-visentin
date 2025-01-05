@@ -8,7 +8,7 @@ developed as the final project for the Web Programming course at the University 
 3. Open a terminal and navigate to the root folder of the project.
 4. Run the following command to start the application using Docker:
 ```
-docker compose up --build
+docker compose up
 ```
 5. Once the application is up and running, open your browser and go to:
 ```
