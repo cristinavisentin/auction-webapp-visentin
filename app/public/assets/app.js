@@ -104,14 +104,12 @@ const app = createApp({
             const d = new Date(date);
             return d > new Date();
         },
-
         getLastBid(bids) {
             if(bids && bids.length > 0) {
                 return bids.reduce((maxBid, bid) => (bid.value > maxBid.value ? bid : maxBid), bids[0]);
             }
             return "Non ci sono ancora offerte";
         },
-
         getId(id) {
             this.id_auction_to_modify = id;
         },

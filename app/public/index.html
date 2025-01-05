@@ -137,7 +137,7 @@
                             </p>
                             <p class="card-text"><strong>Description: </strong>{{ auction_info.description }}</p>
                             <p class="card-text"><strong>Closing date: </strong>{{ new Date(auction_info.closingDate).toLocaleString() }}</p>
-                            <p class="card-text"><strong>Initial value: </strong>€ {{ auction_info.initialValue }}</p>
+                            <p class="card-text"><strong>Initial value:</strong> € {{ auction_info.initialValue }}</p>
                             <p class="card-text"><strong>Current bid: </strong>{{ auction_info.currentBid }}</p>
                             <p class="card-text"><strong>Winner: </strong>
                                 <a href="/" @click.prevent="setSection('userdetails', auction_info.userId)"> {{ auction_info.winner }}</a>
@@ -342,7 +342,7 @@
                         </div>
                     </form>
                     <div class="alert alert-warning" role="alert" v-if="fail">
-                            No such user found.
+                        No such user found.
                     </div>
                     <table class="table table-striped">
                         <thead>
@@ -516,7 +516,6 @@
                                 <th>Name</th>
                                 <th>Surname</th>
                                 <th>Username</th>
-                                <!-- <th></th> -->
                             </tr>
                         </thead>
                         <tbody>
