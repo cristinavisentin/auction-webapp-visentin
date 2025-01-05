@@ -108,7 +108,7 @@ const app = createApp({
             if(bids && bids.length > 0) {
                 return bids.reduce((maxBid, bid) => (bid.value > maxBid.value ? bid : maxBid), bids[0]);
             }
-            return "Non ci sono ancora offerte";
+            return null;
         },
         getId(id) {
             this.id_auction_to_modify = id;

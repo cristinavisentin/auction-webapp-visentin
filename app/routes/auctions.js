@@ -36,7 +36,6 @@ router.post("/",
     async (req, res) => {
         const reqUSER = req.userId;
         let { title, description, closingDate, initialValue } = req.body;
-        console.log(title, description);
         closingDate = new Date(closingDate);
         if(!isAfter(closingDate)) {
             return res.status(406).json({ msg: 'Past dates are not valid' });
