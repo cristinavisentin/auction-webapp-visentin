@@ -15,17 +15,17 @@
     </head>
     <body id="app">
         <section id="browser-window">
+
+            <!-- Navigation bar -->
             <nav class="navbar navbar-expand-lg bg-body-tertiary container mt-4">
                 <div class="container-fluid">
                     <a class="navbar-brand" href="/" @click.prevent="setSection('homepage')">Uollapop</a>
-                  
+
                     <button class="navbar-toggler" 
-                        type="button" 
                         data-bs-toggle="collapse" 
                         data-bs-target="#navbarNav">
                         <span class="navbar-toggler-icon"></span>
                     </button>
-
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <li class="nav-item">
@@ -35,8 +35,6 @@
                                 <a class="nav-link" href="/" @click.prevent="setSection('community')">Community</a>
                             </li>
                         </ul>
-              
-                        <!-- Bottoni Sign In e Sign Up a destra -->
                         <div class="d-flex">
                             <section v-if="!isAuthenticated">
                                 <button class="btn btn-primary me-2" 
@@ -58,9 +56,7 @@
                                     data-bs-toggle="tooltip" 
                                     data-bs-placement="bottom" 
                                     title="Profile">
-                                    <span class="navbar-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16"><path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/><path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/></svg>
-                                    </span>   
+                                    <span class="navbar-icon"><svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16"><path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/><path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/></svg></span>   
                                 </button>
                             </section>
                         </div>
@@ -78,8 +74,11 @@
                     </div>
                 </div>
                 <div class="container mt-5 text-center">
-                    <button class="btn btn-outline-dark me-2" 
+                    <button class="btn btn-outline-dark me-2" v-if="!isAuthenticated"
                         @click.prevent="setSection('signup')">Explore the auctions, join the community and... sell something!
+                    </button>
+                    <button class="btn btn-primary me-2" v-else
+                        @click.prevent="setSection('auctions')">Explore the auctions!
                     </button>
                     <div class="mt-5"><img src="https://s3.ap-southeast-2.amazonaws.com/app-spoke-sites-au/uploads/sites/383/2023/11/auction-toowoomba.png" alt="immagine di aste stilizzata"></div>
                 </div>
@@ -98,7 +97,6 @@
                     <div class="alert alert-warning" role="alert" v-if="fail">
                         No such auction title found.
                     </div>
-                    
                     <table class="table table-striped">
                         <thead>
                             <tr>
@@ -346,7 +344,6 @@
                     <div class="alert alert-warning" role="alert" v-if="fail">
                             No such user found.
                     </div>
-    
                     <table class="table table-striped">
                         <thead>
                             <tr>
@@ -548,18 +545,15 @@
                                         <span class="badge bg-success rounded-pill">Open</span>
                                         <div class="d-flex justify-content-center mt-3">
                                             <button class="btn btn-primary me-2" 
-                                                    @click.prevent="setSection('modify', w.auctionId)">
-                                                Update
+                                                    @click.prevent="setSection('modify', w.auctionId)">Update
                                             </button>
-                                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modal-delete-auction">
-                                                Delete
+                                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modal-delete-auction">Delete
                                             </button>
                                         </div>
                                     </div>
                                     <div v-else>
                                         <span class="badge bg-danger rounded-pill">Closed</span>
                                     </div>
-    
                                     <div class="modal fade" id="modal-delete-auction" tabindex="-1" aria-labelledby="modal-delete-auction-label">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
