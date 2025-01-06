@@ -3,7 +3,7 @@ const isValid = (lastValue, newValue) => {
 };
 
 const getHighestBidValue = (bids, initialValue) => {
-    if (!bids || bids.length === 0) {
+    if(!bids || bids.length === 0) {
         return parseFloat(initialValue);
     }
     return bids.reduce((max, bid) => Math.max(max, parseFloat(bid.value)), parseFloat(initialValue));

@@ -1,9 +1,9 @@
 const express = require('express');
 const db = require('../db/db.js');
 const { validateToken } = require('../utils/token-utils.js');
-
 const router = express.Router();
 
+/* Se autenticato, restituisce le informazioni sull’utente */
 router.get("/", validateToken, async (req, res) => {
     const reqUSER = parseInt(req.userId);
     try {
