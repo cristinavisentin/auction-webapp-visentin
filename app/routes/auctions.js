@@ -31,11 +31,14 @@ router.get("/", query('q').trim().escape(), async (req, res) => {
 /* Crea una nuova asta, solo per utente autenticati */
 router.post("/", 
     validateToken, 
-    body('title').escape(), 
-    body('description').escape(),
+    body('title').trim().escape(), 
+    body('description').trim().escape(),
     async (req, res) => {
         const reqUSER = req.userId;
         let { title, description, closingDate, initialValue } = req.body;
+        if(!title?.trim() || !description?.trim()) {
+            return res.status(411).json({ msg: 'Title and description are required' });
+        }
         closingDate = new Date(closingDate);
         if(!isAfter(closingDate)) {
             return res.status(406).json({ msg: 'Past dates are not valid' });
@@ -86,11 +89,15 @@ router.get("/:id", async (req, res) => {
 /* Modifica di un’asta esistente con identificativo id, previa autenticazione */
 router.put("/:id", 
     validateToken, 
-    body('title').escape(), 
-    body('description').escape(),
+    body('title').trim().escape(), 
+    body('description').trim().escape(),
     async (req, res) => {
         const paramID = parseInt(req.params.id);
         const reqUSER = parseInt(req.userId);
+        const { title, description } = req.body;
+        if(!title?.trim() || !description?.trim()) {
+            return res.status(411).json({ msg: 'Title and description are required' });
+        }
         try {
             const query = { auctionId: paramID, user: reqUSER };
             const mongo = await db.connect2db();
@@ -98,18 +105,13 @@ router.put("/:id",
             if(!requested_auction) {
                 return res.status(403).json({ msg: 'Forbidden: request user is not the owner' });
             }
-            requested_auction.title = req.body.title;
-            requested_auction.description = req.body.description;
-
-            const result = await mongo.collection("auctions").replaceOne(query, requested_auction);
-            if(result.matchedCount === 0) {
-                return res.status(404).json({ msg: 'Auction not found' });
-            } 
-            return res.status(200).json({ msg: 'Auction successfully modified' });
+            const updateFields = { $set: { title: title, description: description } };
+            const result = await mongo.collection("auctions").updateOne(query, updateFields);
+            return res.status(200).json({ msg: 'Auction successfully modified', result });
         } catch(error) {
             console.error("Error.", error);
             return res.status(500).json({ error: 'Internal error' });
-    }
+        }
 });
 
 /* Elimina un’asta esistente con identificativo id, solo il creatore dell’asta può */

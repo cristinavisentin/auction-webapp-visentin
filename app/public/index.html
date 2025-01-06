@@ -166,7 +166,8 @@
                                 type="text" 
                                 id="title" 
                                 class="form-control" 
-                                required>
+                                required
+                                @focus="resetNoInput()">
                         </div>
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>
@@ -174,7 +175,11 @@
                                 type="text" 
                                 id="description" 
                                 class="form-control" 
-                                required>
+                                required
+                                @focus="resetNoInput()">
+                        </div>
+                        <div class="alert alert-warning" role="alert" v-if="noInput">
+                            Title and description are required.
                         </div>
                         <div class="mb-3">
                             <label for="datetime" class="form-label">Closing time</label>
@@ -230,7 +235,8 @@
                                 type="text" 
                                 id="mtitle" 
                                 class="form-control" 
-                                required>
+                                required
+                                @focus="resetNoInput()">
                         </div>
                         <div class="mb-3">
                             <label for="mdescription" class="form-label">Description</label>
@@ -238,7 +244,11 @@
                                 type="text" 
                                 id="mdescription" 
                                 class="form-control" 
-                                required>
+                                required
+                                @focus="resetNoInput()">
+                        </div>
+                        <div class="alert alert-warning" role="alert" v-if="noInput">
+                            Title and description are required.
                         </div>
                         <div class="alert alert-success" role="alert" v-if="success">
                             Auction successfully updated!

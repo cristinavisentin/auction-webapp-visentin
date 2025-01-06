@@ -9,6 +9,7 @@ const app = createApp({
             success: false,
             wrongInput: false,
             noresults: false,
+            noInput: false,
 
             signinData: {
                 username: "",
@@ -55,6 +56,7 @@ const app = createApp({
             this.resetFail();
             this.resetWrongInput();
             this.resetSuccess();
+            this.resetNoInput();
             this.expr = "";
             this.noresults = false;
             this.currentSection = section;
@@ -86,6 +88,9 @@ const app = createApp({
         },
         resetWrongInput(){
             this.wrongInput = false;
+        },
+        resetNoInput() {
+            this.noInput = false;
         },
         resetInputs() {
             this.auctionData.title = "";
@@ -174,6 +179,8 @@ const app = createApp({
                 } else if(response.status === 406){
                     this.fail = true;
                     this.auctionData.closingDatetime = "";
+                } else if(response.status === 411){
+                    this.noInput = true;
                 } else if(response.status === 400){
                     this.wrongInput = true;
                     this.auctionData.initialValue = "";
@@ -204,6 +211,8 @@ const app = createApp({
                         this.resetSuccess();
                         this.resetInputs();
                     }, 1500);
+                } else if(response.status === 411){
+                    this.noInput = true;
                 } else {
                     console.log("Internal error.", await response.json());
                 }  
